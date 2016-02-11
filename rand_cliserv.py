@@ -88,8 +88,11 @@ def main():
         parser.print_help()
         exit()
 
-    host = args.host[0]
-    port = args.port[0]
+    if isinstance(args.host, list):
+        host = args.host[0]
+    if isinstance(args.port, list):
+        port = args.port[0]
+
     if args.server:
         start_server(host, port)
 
