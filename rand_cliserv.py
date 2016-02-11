@@ -78,18 +78,15 @@ def main():
     parser = argparse.ArgumentParser(prog='daqserv')
     parser.add_argument('--host', nargs=1, type=str, help='Host address', default='localhost')
     parser.add_argument('--port', nargs=1, type=int, help='Port number', default=1234)
-    parser.add_argument('--server', action='store_true', help='Start server')
-    parser.add_argument('--client', action='store_true', help='Start client')
     parser.add_argument('--version', action='version', version=__version__)
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--client', action='store_true', help='Start client')
+    group.add_argument('--server', action='store_true', help='Start server')
     parser.set_defaults(server=False)
     parser.set_defaults(client=False)
 
     args = parser.parse_args()
     # check the first switches
-
-    if args.server and args.client:
-        parser.print_help()
-        exit()
 
     if isinstance(args.host, list):
         host = args.host[0]
