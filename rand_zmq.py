@@ -7,65 +7,48 @@ Xaratustrah
 
 """
 
-import socket
-import datetime
+import datetime, time
 import random
 import argparse
+import zmq
 
 __version_info__ = (0, 0, 1)
 __version__ = '.'.join('%d' % d for d in __version_info__)
 
 
 def start_server(host, port):
-    print('Server listening to host %s port %s' % (host, port))
-    # create a socket object
-    serversocket = socket.socket(
-        socket.AF_INET, socket.SOCK_STREAM)
+    context = zmq.Context()
+    sock = context.socket(zmq.PUB)
+    sock.bind("tcp://{}:{}".format(host, port))
 
-    # get local machine name
-    # host = socket.gethostname()
-    # port = 1234
-
-    # bind to the port
-    serversocket.bind((host, port))
-
-    # queue up to 5 requests
-    serversocket.listen(5)
     print('Server started. ctrl-c to abort.\n')
     try:
         while True:
-            # establish a connection
-            clientsocket, addr = serversocket.accept()
-            print("Got a connection from %s" % str(addr))
-
+            topic = '10001'  # just a number for identification
             current_time = datetime.datetime.now().strftime('%Y-%m-%d@%H:%M:%S.%f')
-
             number = round(random.random() * 10, 3)
-            strout = current_time + ' ' + str(number)
-            clientsocket.send(strout.encode('ascii'))
-            clientsocket.close()
+            messagedata = current_time + ' ' + str(number)
+            print("{} {}".format(topic, messagedata))
+            sock.send_string("{} {}".format(topic, messagedata))
+            time.sleep(0.5)
 
     except(EOFError, KeyboardInterrupt):
         print('\nUser input cancelled. Aborting...')
 
 
 def start_client(host, port):
-    print('Client connecting to host %s port %s' % (host, port))
-    # create a socket object
+    context = zmq.Context()
+    print('Client started. ctrl-c to abort.\n')
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock = context.socket(zmq.SUB)
+        sock.connect("tcp://{}:{}".format(host, port))
+        topic_filter = '10001'
+        sock.setsockopt_string(zmq.SUBSCRIBE, topic_filter)
 
-        # get local machine name
-        # host = socket.gethostname()
-        # port = 1234
-
-        # connection to hostname on the port.
-        s.connect((host, port))
-
-        # Receive no more than 1024 bytes
-        tm = s.recv(1024)
-        s.close()
-        print("%s" % tm.decode('ascii'))
+        for update_nbr in range(5):
+            string = sock.recv().decode("utf-8")
+            topic, time, value = string.split()
+            print(time, float(value))
 
     except(ConnectionRefusedError):
         print('Server not running. Aborting...')
