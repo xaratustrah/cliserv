@@ -70,6 +70,9 @@ def start_client(host, port):
     except(ConnectionRefusedError):
         print('Server not running. Aborting...')
 
+    except(EOFError, KeyboardInterrupt):
+        print('\nUser input cancelled. Aborting...')
+
 
 def main():
     parser = argparse.ArgumentParser(prog='daqserv')
