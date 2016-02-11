@@ -88,11 +88,13 @@ def main():
         parser.print_help()
         exit()
 
+    host = args.host[0]
+    port = args.port[0]
     if args.server:
-        start_server(args.host, args.port)
+        start_server(host, port)
 
     elif args.host:
-        start_client(args.host, args.port)
+        start_client(host, port)
 
     else:
         parser.print_help()
