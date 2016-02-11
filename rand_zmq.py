@@ -19,6 +19,8 @@ __version__ = '.'.join('%d' % d for d in __version_info__)
 def start_server(host, port):
     context = zmq.Context()
     sock = context.socket(zmq.PUB)
+
+    print("tcp://{}:{}".format(host, port))
     sock.bind("tcp://{}:{}".format(host, port))
 
     print('Server started. ctrl-c to abort.\n')
