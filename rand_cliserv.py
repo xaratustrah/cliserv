@@ -90,8 +90,13 @@ def main():
 
     if isinstance(args.host, list):
         host = args.host[0]
+    else:
+        host = args.host
+
     if isinstance(args.port, list):
         port = args.port[0]
+    else:
+        port = args.port
 
     if args.server:
         start_server(host, port)
