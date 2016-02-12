@@ -12,12 +12,6 @@ import random
 import argparse
 import zmq
 
-try:
-    import RPi.GPIO as gpio
-except RuntimeError:
-    print("""Error importing RPi.GPIO!  This is probably because you need superuser privileges.
-                You can achieve this by using 'sudo' to run your script""")
-
 __version_info__ = (0, 0, 1)
 __version__ = '.'.join('%d' % d for d in __version_info__)
 
@@ -31,6 +25,12 @@ CS = 29
 
 
 def gpio_setup():
+    try:
+        import RPi.GPIO as gpio
+    except RuntimeError:
+        print("""Error importing RPi.GPIO!  This is probably because you need superuser privileges.
+                    You can achieve this by using 'sudo' to run your script""")
+
     gpio.setwarnings(False)
     gpio.setmode(gpio.BOARD)
     gpio.setup(LED, gpio.OUT)
